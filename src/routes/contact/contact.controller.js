@@ -27,7 +27,7 @@ const verify = async (req, res) => {
     }
     await Promise.all([
       contactUtil.updateContact(`linkPrecedence='secondary', linkedId=${linkId}`, `WHERE id=${contactToSwitch.id}`),
-      contactUtil.updateContact(`linkedId=${linkId}`, `WHERE linkedId=${contactToSwitch.id}, linkPrecedence='secondary'`)
+      contactUtil.updateContact(`linkedId=${linkId}`, `WHERE linkedId=${contactToSwitch.id} AND linkPrecedence='secondary'`)
    ]);
   }
   contacts = await contactUtil.fetchContactsRecursive({ email, phoneNumber });
