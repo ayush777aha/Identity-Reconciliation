@@ -34,17 +34,20 @@ const updateContact = (setStatement, whereClause) => {
   });
 };
 
-const fetchContactsRecursive = async ({email, phoneNumber}) => {
-   let contacts = await fetchContacts("id linkedId", `WHERE email='${email}' OR phoneNumber='${phoneNumber}'`, "LIMIT 1");
-   if (contacts.length === 0) return [];
-   const [contact] = contacts;
-   const { id, linkedId } = contact;
-   if (linkedId) {
-      contacts = await fetchContacts("*", `WHERE id='${linkedId}' OR linkedId='${linkedId}'`);
-   } else contacts = await fetchContacts("*", `WHERE id='${id}' OR linkedId='${id}'`);
-   contacts.sort((a, b) => a.id - b.id);
-   console.log("CONTACTS***************", contacts, "********************8")
-   return contacts;
+const fetchContactsRecursive = async ({ email, phoneNumber }) => {
+  let contacts = await fetchContacts(
+    "id, linkedId",
+    `WHERE email='${email}' OR phoneNumber='${phoneNumber}'`,
+    "LIMIT 1"
+  );
+  if (contacts.length === 0) return [];
+  const [contact] = contacts;
+  const { id, linkedId } = contact;
+  if (linkedId) {
+    contacts = await fetchContacts("*", `WHERE id='${linkedId}' OR linkedId='${linkedId}'`);
+  } else contacts = await fetchContacts("*", `WHERE id='${id}' OR linkedId='${id}'`);
+  contacts.sort((a, b) => a.id - b.id);
+  return contacts;
 };
 
 const doesContactContainsNewInfo = (contacts, newContact) => {
@@ -55,14 +58,11 @@ const doesContactContainsNewInfo = (contacts, newContact) => {
   return contactsHavingSameEmail.length === 0 || contactsHavingSamePhoneNumber.length === 0;
 };
 
-const shouldSwitchFromPrimaryToSecondary = (contacts, newContact) => {
-  const [primaryContactWithSameEmail] = contacts.filter(
-    (contact) => contact.email === newContact.email && contact.linkPrecedence === "primary"
-  );
-  const [primaryContactWithSamePhoneNumber] = contacts.filter(
-    (contact) =>
-      contact.phoneNumber === newContact.phoneNumber && contact.linkPrecedence === "primary"
-  );
+const shouldSwitchFromPrimaryToSecondary = async ({ email, phoneNumber }) => {
+  const [[primaryContactWithSameEmail], [primaryContactWithSamePhoneNumber]] = await Promise.all([
+   fetchContacts("*", `WHERE email='${email}' AND linkPrecedence='primary'`),
+   fetchContacts("*", `WHERE phoneNumber='${phoneNumber}' AND linkPrecedence='primary'`),
+  ]);
   if (!primaryContactWithSameEmail || !primaryContactWithSamePhoneNumber)
     return [false, null, null];
   return [
