@@ -12,8 +12,8 @@ const createContact = (values) => {
   });
 };
 
-const fetchContacts = (selectColumns, whereClause) => {
-  const sql = `SELECT ${selectColumns} FROM contacts ${whereClause}`;
+const fetchContacts = (selectColumns, whereClause, limit = "", skip = "") => {
+  const sql = `SELECT ${selectColumns} FROM contacts ${whereClause} ${skip} ${limit}`;
   return new Promise((resolve, reject) => {
     db.query(sql, (err, result) => {
       if (err) {
@@ -32,6 +32,19 @@ const updateContact = (setStatement, whereClause) => {
       resolve(result);
     });
   });
+};
+
+const fetchContactsRecursive = async ({email, phoneNumber}) => {
+   let contacts = await fetchContacts("id linkedId", `WHERE email='${email}' OR phoneNumber='${phoneNumber}'`, "LIMIT 1");
+   if (contacts.length === 0) return [];
+   const [contact] = contacts;
+   const { id, linkedId } = contact;
+   if (linkedId) {
+      contacts = await fetchContacts("*", `WHERE id='${linkedId}' OR linkedId='${linkedId}'`);
+   } else contacts = await fetchContacts("*", `WHERE id='${id}' OR linkedId='${id}'`);
+   contacts.sort((a, b) => a.id - b.id);
+   console.log("CONTACTS***************", contacts, "********************8")
+   return contacts;
 };
 
 const doesContactContainsNewInfo = (contacts, newContact) => {
@@ -85,16 +98,20 @@ const generateContactResponse = (contacts) => {
   return result;
 };
 
-const getLinkId = (contact1, contact2) => {
-  const id1 = contact1 && contact1.id;
-  const id2 = contact2 && contact2.id;
-  return id1 || id2;
+const getLinkId = (contacts, newContact) => {
+  const [contact] = contacts.filter(
+    (contact) =>
+      (contact.email === newContact.email || contact.phoneNumber === newContact.phoneNumber) &&
+      contact.linkPrecedence === "primary"
+  );
+  return contact.id;
 };
 
 module.exports = {
   createContact,
   fetchContacts,
   updateContact,
+  fetchContactsRecursive,
   doesContactContainsNewInfo,
   shouldSwitchFromPrimaryToSecondary,
   updateContactListFromPrimaryToSecondary,
