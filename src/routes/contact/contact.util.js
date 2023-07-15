@@ -53,7 +53,7 @@ const shouldSwitchFromPrimaryToSecondary = (contacts, newContact) => {
   if (!primaryContactWithSameEmail || !primaryContactWithSamePhoneNumber)
     return [false, null, null];
   return [
-    primaryContactWithSameEmail.id !== primaryContactWithSamePhoneNumber,
+    primaryContactWithSameEmail.id !== primaryContactWithSamePhoneNumber.id,
     primaryContactWithSameEmail,
     primaryContactWithSamePhoneNumber,
   ];
@@ -68,6 +68,29 @@ const updateContactListFromPrimaryToSecondary = (contacts, id) => {
   }
 };
 
+const generateContactResponse = (contacts) => {
+  const result = {};
+  const emails = new Set();
+  const phoneNumbers = new Set();
+  const secondaryContactIds = new Set();
+  contacts.forEach((contact) => {
+    if (contact.linkPrecedence === "primary") result.primaryContatctId = contact.id;
+    if (contact.email) emails.add(contact.email);
+    if (contact.phoneNumber) phoneNumbers.add(contact.phoneNumber);
+    if (contact.linkPrecedence === "secondary") secondaryContactIds.add(contact.id);
+  });
+  result.emails = Array.from(emails);
+  result.phoneNumbers = Array.from(phoneNumbers);
+  result.secondaryContactIds = Array.from(secondaryContactIds);
+  return result;
+};
+
+const getLinkId = (contact1, contact2) => {
+  const id1 = contact1 && contact1.id;
+  const id2 = contact2 && contact2.id;
+  return id1 || id2;
+};
+
 module.exports = {
   createContact,
   fetchContacts,
@@ -75,4 +98,6 @@ module.exports = {
   doesContactContainsNewInfo,
   shouldSwitchFromPrimaryToSecondary,
   updateContactListFromPrimaryToSecondary,
+  generateContactResponse,
+  getLinkId,
 };
