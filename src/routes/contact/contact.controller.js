@@ -6,22 +6,23 @@ const verify = async (req, res) => {
     contactUtil.fetchContacts("*", `WHERE email='${email}'`),
     contactUtil.fetchContacts("*", `WHERE phoneNumber='${phoneNumber}'`),
   ]);
-//   const containsSameInformation = [
+
+//   const contactsHavingSameEmail = [
 //     ...contactsWithGivenEmail,
 //     ...contactsWithGivenPhoneNumber,
-//   ].filter((contact) => {
-//     return contact.email === email && contact.phoneNumber === phoneNumber;
-//   });
-  const contactsHavingSameEmail = [
-       ...contactsWithGivenEmail,
-       ...contactsWithGivenPhoneNumber,
-     ].filter((contact) => {
-       return contact.email === email && contact.phoneNumber === phoneNumber;
-     });
+//   ].filter((contact) => contact.email === email);
+//   const contactsHavingSamePhoneNumber = [
+//     ...contactsWithGivenEmail,
+//     ...contactsWithGivenPhoneNumber,
+//   ].filter((contact) => contact.phoneNumber === phoneNumber);
+  const contactHavingNewInformation = contactUtil.doesContactContainsNewInfo(
+    [...contactsWithGivenEmail, ...contactsWithGivenPhoneNumber],
+    { email, phoneNumber }
+  );
   // new contact
   if (contactsWithGivenEmail.length == 0 && contactsWithGivenPhoneNumber.length == 0) {
     await contactUtil.createContact({ email, phoneNumber, linkPrecedence: "primary" });
-  } else if (containsSameInformation.length == 0) {
+  } else if (contactHavingNewInformation) {
     await contactUtil.createContact({ email, phoneNumber, linkPrecedence: "secondary" });
   }
   return res.json({ ok: "ok" });
