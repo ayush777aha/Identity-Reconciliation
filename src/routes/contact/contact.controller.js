@@ -7,14 +7,6 @@ const verify = async (req, res) => {
     contactUtil.fetchContacts("*", `WHERE phoneNumber='${phoneNumber}'`),
   ]);
 
-//   const contactsHavingSameEmail = [
-//     ...contactsWithGivenEmail,
-//     ...contactsWithGivenPhoneNumber,
-//   ].filter((contact) => contact.email === email);
-//   const contactsHavingSamePhoneNumber = [
-//     ...contactsWithGivenEmail,
-//     ...contactsWithGivenPhoneNumber,
-//   ].filter((contact) => contact.phoneNumber === phoneNumber);
   const contactHavingNewInformation = contactUtil.doesContactContainsNewInfo(
     [...contactsWithGivenEmail, ...contactsWithGivenPhoneNumber],
     { email, phoneNumber }

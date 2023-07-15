@@ -24,10 +24,10 @@ const fetchContacts = (selectColumns, whereClause) => {
   });
 };
 
-const doesContactContainsNewInfo = (contacts, contact) => {
-  const contactsHavingSameEmail = contacts.filter((contact) => contact.email === contact.email);
+const doesContactContainsNewInfo = (contacts, newContact) => {
+  const contactsHavingSameEmail = contacts.filter((contact) => contact.email === newContact.email);
   const contactsHavingSamePhoneNumber = contacts.filter(
-    (contact) => contact.phoneNumber === contact.phoneNumber
+    (contact) => contact.phoneNumber === newContact.phoneNumber
   );
   return contactsHavingSameEmail.length === 0 || contactsHavingSamePhoneNumber.length === 0;
 };
@@ -35,4 +35,5 @@ const doesContactContainsNewInfo = (contacts, contact) => {
 module.exports = {
   createContact,
   fetchContacts,
+  doesContactContainsNewInfo,
 };
