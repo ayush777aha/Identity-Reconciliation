@@ -1,13 +1,13 @@
 # bitespeed
 
-service endpoint:- https://bitespeed-kx36.onrender.com/identify
+service endpoint:- https://long-lime-quail-coat.cyclic.app/identify
 
 sample curl
 ```
-curl --location --request POST 'https://bitespeed-kx36.onrender.com/identify' \
+curl --location --request POST 'https://long-lime-quail-coat.cyclic.app/identify' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "email": "george@hillvalley.edu",
+    "email": "georg1e@hillvalley.edu",
     "phoneNumber": "123456"
 }'
 ```
