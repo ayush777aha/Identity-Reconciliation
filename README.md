@@ -1,6 +1,6 @@
 # bitespeed
 
-service endpoint:- https://indentity-reconsilation-service.onrender.com/identify/ping
+service endpoint:- https://indentity-reconsilation-service.onrender.com/ping
 
 sample curl
 ```
