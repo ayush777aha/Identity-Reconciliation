@@ -104,7 +104,7 @@ const getLinkId = (contacts, newContact) => {
       (contact.email === newContact.email || contact.phoneNumber === newContact.phoneNumber) &&
       contact.linkPrecedence === "primary"
   );
-  return contact.id;
+  return contact?.id;
 };
 
 module.exports = {
